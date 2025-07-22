@@ -10,20 +10,47 @@ class CorsMiddleware
 {
     /**
      * Handle an incoming request.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Closure  $next
-     * @return mixed
      */
     public function handle(Request $request, Closure $next): Response
     {
-        // Má prática: permitir todas as origens sem restrições
+        // Handle preflight OPTIONS request
+        if ($request->getMethod() === 'OPTIONS') {
+            return response('', 200)
+                ->header('Access-Control-Allow-Origin', $this->getAllowedOrigin($request))
+                ->header('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE, OPTIONS')
+                ->header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With')
+                ->header('Access-Control-Max-Age', '86400'); // Cache preflight for 24 hours
+        }
+
         $response = $next($request);
         
-        $response->headers->set('Access-Control-Allow-Origin', '*');
-        $response->headers->set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-        $response->headers->set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+        // Add CORS headers to actual requests
+        $response->headers->set('Access-Control-Allow-Origin', $this->getAllowedOrigin($request));
+        $response->headers->set('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE, OPTIONS');
+        $response->headers->set('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With');
         
         return $response;
+    }
+
+    /**
+     * Get allowed origin based on environment and request.
+     */
+    private function getAllowedOrigin(Request $request): string
+    {
+        $allowedOrigins = [
+            'http://localhost:4200',
+            'http://127.0.0.1:4200',
+        ];
+
+        $origin = $request->header('Origin');
+        
+        // In development, allow localhost origins
+        if (app()->environment('local') && $origin && in_array($origin, $allowedOrigins)) {
+            return $origin;
+        }
+        
+        // For production, you should configure specific allowed origins
+        // For this demo, we'll allow the frontend origin
+        return 'http://localhost:4200';
     }
 }
