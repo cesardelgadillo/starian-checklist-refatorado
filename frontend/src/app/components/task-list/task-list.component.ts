@@ -60,7 +60,7 @@ import { Task } from '../../models/task.interface';
               [disabled]="loading"
               title="Remover tarefa"
             >
-              🗑 Remover
+              ✕ Remover
             </button>
           </div>
         </li>
