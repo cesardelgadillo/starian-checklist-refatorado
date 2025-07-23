@@ -12,7 +12,7 @@ import { NotificationComponent, NotificationMessage } from './components/notific
 
 /**
  * Componente principal da aplicação responsável pelo gerenciamento de tarefas.
- * 
+ *
  * Funcionalidades:
  * - Operações CRUD para tarefas
  * - Notificações em tempo real
@@ -23,7 +23,7 @@ import { NotificationComponent, NotificationMessage } from './components/notific
   selector: 'app-root',
   standalone: true,
   imports: [
-    RouterOutlet, 
+    RouterOutlet,
     CommonModule,
     TaskListComponent,
     TaskFormComponent,
@@ -178,7 +178,7 @@ export class AppComponent implements OnInit, OnDestroy {
             this.tasks[taskIndex] = updated;
             this.cdr.markForCheck();
           }
-          
+
           const status = updated.completed ? 'concluída' : 'reaberta';
           this.notificationService.showSuccess(`Tarefa "${updated.title}" ${status}!`);
         },

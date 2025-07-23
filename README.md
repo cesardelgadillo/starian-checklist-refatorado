@@ -87,15 +87,15 @@ docker-compose exec laravel php artisan db:seed
 
 ### Funcionalidades Implementadas
 
-- ✅ **CRUD completo de tarefas**
-- ✅ **Interface responsiva** (mobile-first)
-- ✅ **Notificações em tempo real**
-- ✅ **Estados de carregamento**
-- ✅ **Arquitetura modular** (componentes standalone Angular 17)
-- ✅ **API RESTful** (Laravel 11 com padrões de repository e service)
-- ✅ **Hot reload** otimizado para desenvolvimento
-- ✅ **Tratamento de erros** consistente
-- ✅ **Validação de dados** (frontend e backend)
+- **CRUD completo de tarefas**
+- **Interface responsiva** (mobile-first)
+- **Notificações em tempo real**
+- **Estados de carregamento**
+- **Arquitetura modular** (componentes standalone Angular 17)
+- **API RESTful** (Laravel 11 com padrões de repository e service)
+- **Hot reload** otimizado para desenvolvimento
+- **Tratamento de erros** consistente
+- **Validação de dados** (frontend e backend)
 
 ### Tecnologias Utilizadas
 
