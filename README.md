@@ -1,4 +1,4 @@
-# 🧪 Teste Técnico — Refatoração Fullstack (Angular + PHP)
+# Teste Técnico — Refatoração Fullstack (Angular + PHP)
 
 
 Bem-vindo(a) ao teste técnico!  
@@ -8,7 +8,7 @@ O objetivo deste teste **não é entregar uma feature nova**, mas sim **refatora
 
 ---
 
-## 🎯 Objetivo
+## Objetivo
 
 Avaliar sua capacidade de:
 
@@ -19,7 +19,7 @@ Avaliar sua capacidade de:
 - Escrever código de forma clara, coesa e consistente
 - Garantir responsividade.
 
-📬 Instruções de Entrega
+**Instruções de Entrega**
 - Crie um novo respositório utilizando este como template;
   <img width="1285" height="242" alt="image" src="https://github.com/user-attachments/assets/093203bc-88d3-4806-b688-877369d0bfec" />
 - Clone o seu repositório gerado do template;
@@ -27,7 +27,7 @@ Avaliar sua capacidade de:
 
 ---
 
-## 🚀 Como Executar a Aplicação
+## Como Executar a Aplicação
 
 ### Pré-requisitos
 - [Docker](https://www.docker.com/get-started) instalado
@@ -85,17 +85,103 @@ docker-compose exec laravel php artisan migrate
 docker-compose exec laravel php artisan db:seed
 ```
 
+## Testes
+
+Este projeto implementa uma **suíte de testes** para demonstrar boas práticas de qualidade de código no frontend Angular.
+
+### Cobertura de Testes
+
+**Estatísticas:**
+- 61 testes implementados (todos passando)
+- ~70% cobertura de código (gerada pelo Karma)
+- Cobertura dos principais fluxos da aplicação
+
+**Tipos de Testes:**
+- Testes Unitários - Services (TaskService, NotificationService)
+- Testes de Componentes - UI components com TestBed
+- Testes HTTP - Mock de APIs com HttpClientTestingModule
+- Testes de Formulários - Validação e user interaction
+- Testes de Template - DOM rendering e event handling
+
+### Executando Testes Localmente
+
+**Pré-requisitos:**
+```bash
+cd frontend
+npm install
+```
+
+**Comandos principais:**
+```bash
+# Execução única (headless)
+npm test -- --watch=false --browsers=ChromeHeadless
+
+# Execução em modo watch (desenvolvimento)
+npm test
+
+# Execução com coverage
+npm run test:coverage
+```
+
+**Resultado esperado:**
+```
+Chrome Headless: Executed 61 of 61 SUCCESS
+TOTAL: 61 SUCCESS
+```
+
+### Executando Testes via Docker
+
+```bash
+# Testes no container Angular
+docker-compose exec angular npm run test:ci
+
+# Com coverage
+docker-compose exec angular npm run test:coverage
+
+# Testes Laravel
+docker-compose exec laravel php artisan test
+```
+
+### Estrutura dos Testes
+
+```
+src/app/
+├── services/
+│   ├── task.service.spec.ts         # 28 testes HTTP
+│   └── notification.service.spec.ts # 7 testes Observable
+├── components/
+│   ├── task-form/task-form.component.spec.ts    # 20 testes
+│   ├── task-list/task-list.component.spec.ts    # 15 testes
+│   └── notification/notification.component.spec.ts # 13 testes
+├── app.component.spec.ts            # 3 testes integração
+├── karma.conf.js                    # Configuração Karma
+└── test.ts                          # Setup testes
+```
+
+> **Documentação Detalhada**: Consulte `frontend/TESTING.md` para guia completo de testes e padrões implementados.
+
+### Tecnologias de Teste
+
+**Ferramentas:**
+- Karma + Jasmine para execução
+- TestBed para configuração de módulos
+- HttpClientTestingModule para mock de APIs
+- ComponentFixture para testes de componentes
+
 ### Funcionalidades Implementadas
 
-- **CRUD completo de tarefas**
-- **Interface responsiva** (mobile-first)
-- **Notificações em tempo real**
-- **Estados de carregamento**
-- **Arquitetura modular** (componentes standalone Angular 17)
-- **API RESTful** (Laravel 11 com padrões de repository e service)
-- **Hot reload** otimizado para desenvolvimento
-- **Tratamento de erros** consistente
-- **Validação de dados** (frontend e backend)
+- CRUD completo de tarefas
+- Interface responsiva (mobile-first)
+- Notificações em tempo real
+- Estados de carregamento
+- Arquitetura modular (componentes standalone Angular 17)
+- API RESTful (Laravel 11 com padrões de repository e service)
+- Hot reload otimizado para desenvolvimento
+- Tratamento de erros consistente
+- Validação de dados (frontend e backend)
+- Suíte de testes (61 testes, todos passando)
+- Code coverage (relatórios automáticos via Karma)
+- CI/CD ready (testes automatizados)
 
 ### Tecnologias Utilizadas
 
@@ -104,14 +190,18 @@ docker-compose exec laravel php artisan db:seed
 - TypeScript
 - SCSS
 - RxJS para programação reativa
+- Karma + Jasmine para testes
+- HttpClientTestingModule para mocks
 
 **Backend:**
 - Laravel 11
 - PHP 8.3
 - SQLite (banco de dados)
 - Eloquent ORM
+- PHPUnit para testes
 
 **DevOps:**
 - Docker & Docker Compose
 - Hot reload configurado
 - Environment isolation
+- Automated testing pipeline ready
