@@ -15,10 +15,10 @@ import { CreateTaskDto } from '../../models/task.interface';
           Nova Tarefa
         </label>
         <div class="task-form__input-group">
-          <input 
+          <input
             id="taskTitle"
-            type="text" 
-            [(ngModel)]="taskTitle" 
+            type="text"
+            [(ngModel)]="taskTitle"
             name="taskTitle"
             placeholder="Digite uma nova tarefa..."
             class="task-form__input"
@@ -28,7 +28,7 @@ import { CreateTaskDto } from '../../models/task.interface';
             (blur)="validateInput()"
             required
           />
-          <button 
+          <button
             type="submit"
             class="btn btn--primary"
             [disabled]="!isFormValid() || loading"
@@ -58,7 +58,7 @@ export class TaskFormComponent {
       const newTask: CreateTaskDto = {
         title: this.taskTitle.trim()
       };
-      
+
       this.createTask.emit(newTask);
       this.resetForm();
     }
@@ -70,7 +70,7 @@ export class TaskFormComponent {
 
   validateInput(): void {
     this.showError = false;
-    
+
     if (this.taskTitle.trim().length === 0) {
       this.showError = true;
       this.errorMessage = 'O título da tarefa é obrigatório';

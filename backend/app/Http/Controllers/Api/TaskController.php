@@ -10,6 +10,16 @@ use App\Services\TaskService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
+/**
+ * Controller responsável por gerenciar as operações da API de tarefas.
+ * 
+ * Implementa operações CRUD completas seguindo padrões REST:
+ * - GET /api/tasks - Lista todas as tarefas
+ * - POST /api/tasks - Cria uma nova tarefa
+ * - GET /api/tasks/{id} - Exibe uma tarefa específica
+ * - PUT /api/tasks/{id} - Atualiza uma tarefa
+ * - DELETE /api/tasks/{id} - Remove uma tarefa
+ */
 class TaskController extends Controller
 {
     public function __construct(
@@ -17,7 +27,9 @@ class TaskController extends Controller
     ) {}
 
     /**
-     * Display a listing of tasks.
+     * Retorna a listagem de todas as tarefas ordenadas por data de criação.
+     * 
+     * @return AnonymousResourceCollection Lista de tarefas formatadas via TaskResource
      */
     public function index(): AnonymousResourceCollection
     {
@@ -27,7 +39,10 @@ class TaskController extends Controller
     }
 
     /**
-     * Store a newly created task.
+     * Armazena uma nova tarefa no banco de dados.
+     * 
+     * @param CreateTaskRequest $request Dados validados da tarefa
+     * @return TaskResource Tarefa criada formatada
      */
     public function store(CreateTaskRequest $request): TaskResource
     {

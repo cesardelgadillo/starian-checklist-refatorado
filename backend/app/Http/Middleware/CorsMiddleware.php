@@ -23,12 +23,12 @@ class CorsMiddleware
         }
 
         $response = $next($request);
-        
+
         // Add CORS headers to actual requests
         $response->headers->set('Access-Control-Allow-Origin', $this->getAllowedOrigin($request));
         $response->headers->set('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE, OPTIONS');
         $response->headers->set('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With');
-        
+
         return $response;
     }
 
@@ -43,12 +43,12 @@ class CorsMiddleware
         ];
 
         $origin = $request->header('Origin');
-        
+
         // In development, allow localhost origins
         if (app()->environment('local') && $origin && in_array($origin, $allowedOrigins)) {
             return $origin;
         }
-        
+
         // For production, you should configure specific allowed origins
         // For this demo, we'll allow the frontend origin
         return 'http://localhost:4200';

@@ -10,6 +10,15 @@ import { TaskListComponent } from './components/task-list/task-list.component';
 import { TaskFormComponent } from './components/task-form/task-form.component';
 import { NotificationComponent, NotificationMessage } from './components/notification/notification.component';
 
+/**
+ * Componente principal da aplicação responsável pelo gerenciamento de tarefas.
+ * 
+ * Funcionalidades:
+ * - Operações CRUD para tarefas
+ * - Notificações em tempo real
+ * - Gerenciamento de estados de carregamento
+ * - Atualizações reativas usando estratégia OnPush
+ */
 @Component({
   selector: 'app-root',
   standalone: true,
@@ -30,6 +39,7 @@ export class AppComponent implements OnInit, OnDestroy {
   loading = false;
   notification: NotificationMessage | null = null;
 
+  // Subject para gerenciar o ciclo de vida do componente e prevenir vazamentos de memória
   private destroy$ = new Subject<void>();
 
   constructor(
@@ -48,6 +58,9 @@ export class AppComponent implements OnInit, OnDestroy {
     this.destroy$.complete();
   }
 
+  /**
+   * Inscreve-se nas notificações do serviço para exibir mensagens ao usuário
+   */
   private subscribeToNotifications(): void {
     this.notificationService.notification$
       .pipe(takeUntil(this.destroy$))
@@ -57,6 +70,9 @@ export class AppComponent implements OnInit, OnDestroy {
       });
   }
 
+  /**
+   * Carrega a lista inicial de tarefas do backend
+   */
   private loadTasks(): void {
     this.loading = true;
     this.cdr.markForCheck();
@@ -81,6 +97,10 @@ export class AppComponent implements OnInit, OnDestroy {
       });
   }
 
+  /**
+   * Manipula a criação de uma nova tarefa
+   * @param taskDto - Dados da tarefa a ser criada
+   */
   onCreateTask(taskDto: CreateTaskDto): void {
     this.loading = true;
     this.cdr.markForCheck();
@@ -105,6 +125,10 @@ export class AppComponent implements OnInit, OnDestroy {
       });
   }
 
+  /**
+   * Remove uma tarefa da lista
+   * @param task - Tarefa a ser removida
+   */
   onDeleteTask(task: Task): void {
     this.loading = true;
     this.cdr.markForCheck();
@@ -129,6 +153,10 @@ export class AppComponent implements OnInit, OnDestroy {
       });
   }
 
+  /**
+   * Alterna o status de conclusão de uma tarefa
+   * @param task - Tarefa a ter o status alterado
+   */
   onToggleTaskCompletion(task: Task): void {
     this.loading = true;
     this.cdr.markForCheck();

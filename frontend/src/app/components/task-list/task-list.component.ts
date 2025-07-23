@@ -10,19 +10,19 @@ import { Task } from '../../models/task.interface';
   template: `
     <div class="task-list">
       <h2 class="task-list__title">Tarefas</h2>
-      
+
       <div *ngIf="tasks.length === 0" class="task-list__empty">
         <p>Nenhuma tarefa encontrada.</p>
       </div>
-      
+
       <ul *ngIf="tasks.length > 0" class="task-list__items">
-        <li 
-          *ngFor="let task of tasks; trackBy: trackByTaskId" 
+        <li
+          *ngFor="let task of tasks; trackBy: trackByTaskId"
           class="task-item"
           [class.task-item--completed]="task.completed"
         >
           <div class="task-item__content">
-            <span 
+            <span
               class="task-item__title"
               [class.task-item__title--completed]="task.completed"
             >
@@ -32,9 +32,9 @@ import { Task } from '../../models/task.interface';
               {{ task.completed ? 'Concluída' : 'Pendente' }}
             </span>
           </div>
-          
+
           <div class="task-item__actions">
-            <button 
+            <button
               *ngIf="!task.completed"
               (click)="onToggleComplete(task)"
               class="btn btn--success"
@@ -43,8 +43,8 @@ import { Task } from '../../models/task.interface';
             >
               ✓ Concluir
             </button>
-            
-            <button 
+
+            <button
               *ngIf="task.completed"
               (click)="onToggleComplete(task)"
               class="btn btn--warning"
@@ -53,8 +53,8 @@ import { Task } from '../../models/task.interface';
             >
               ↻ Reabrir
             </button>
-            
-            <button 
+
+            <button
               (click)="onDelete(task)"
               class="btn btn--danger"
               [disabled]="loading"
