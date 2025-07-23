@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test API Connection - Fresh</title>
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+</head>
+<body>
+    <h1>Test API Connection - Fresh Build</h1>
+    <button onclick="testAPI()">Test API Now</button>
+    <div id="result"></div>
+    <hr>
+    <h2>Backend Status</h2>
+    <p>Expected: Laravel API at http://localhost:8000/api/tasks</p>
+    <p>Frontend: Angular at http://localhost:4200</p>
+
+    <script>
+        async function testAPI() {
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = '<p>Testing...</p>';
+            
+            try {
+                console.log('Making request to API...');
+                const response = await fetch('http://localhost:8000/api/tasks', {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    }
+                });
+                
+                console.log('Response status:', response.status);
+                console.log('Response headers:', [...response.headers.entries()]);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                console.log('Data received:', data);
+                
+                document.getElementById('result').innerHTML = `
+                    <h2>✅ Success!</h2>
+                    <p><strong>Status:</strong> ${response.status}</p>
+                    <p><strong>Tasks found:</strong> ${data.data ? data.data.length : 'N/A'}</p>
+                    <pre>${JSON.stringify(data, null, 2)}</pre>
+                `;
+            } catch (error) {
+                console.error('Error:', error);
+                document.getElementById('result').innerHTML = `
+                    <h2>❌ Error!</h2>
+                    <p><strong>Error:</strong> ${error.message}</p>
+                    <p>Check console for more details</p>
+                `;
+            }
+        }
+        
+        // Auto test on load
+        setTimeout(testAPI, 1000);
+    </script>
+</body>
+</html>

@@ -1,72 +1,163 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
-import { HttpClient, HttpClientModule } from '@angular/common/http';
+import { Subject, takeUntil, finalize } from 'rxjs';
+
+import { Task, CreateTaskDto } from './models/task.interface';
+import { TaskService } from './services/task.service';
+import { NotificationService } from './services/notification.service';
+import { TaskListComponent } from './components/task-list/task-list.component';
+import { TaskFormComponent } from './components/task-form/task-form.component';
+import { NotificationComponent, NotificationMessage } from './components/notification/notification.component';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, CommonModule, FormsModule, HttpClientModule],
+  imports: [
+    RouterOutlet, 
+    CommonModule,
+    TaskListComponent,
+    TaskFormComponent,
+    NotificationComponent
+  ],
   templateUrl: './app.component.html',
-  styleUrl: './app.component.scss'
+  styleUrls: ['./app.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class AppComponent implements OnInit {
-  title = 'Todo List';
-  todos: any[] = [];
-  newTodo: any = { title: '', completed: false };
-  apiUrl = 'http://localhost:8000/tarefas';
+export class AppComponent implements OnInit, OnDestroy {
+  title = 'Lista de Tarefas';
+  tasks: Task[] = [];
+  loading = false;
+  notification: NotificationMessage | null = null;
 
-  constructor(private http: HttpClient) {}
+  private destroy$ = new Subject<void>();
 
-  ngOnInit() {
-    this.http.get(this.apiUrl).subscribe(
-      (data: any) => {
-        this.todos = data;
-      },
-      (erro) => {
-        console.error('Erro ao carregar tarefas:', erro);
-        this.todos = [
-          { id: 1, title: 'Tarefa offline 1', completed: false },
-          { id: 2, title: 'Tarefa offline 2', completed: true }
-        ];
-      }
-    );
+  constructor(
+    private taskService: TaskService,
+    private notificationService: NotificationService,
+    private cdr: ChangeDetectorRef
+  ) {}
+
+  ngOnInit(): void {
+    this.subscribeToNotifications();
+    this.loadTasks();
   }
 
-  addTodo() {
-    if (!this.newTodo.title.trim()) return;
-    
-    this.http.post(this.apiUrl, {
-      title: this.newTodo.title
-    }).subscribe(
-      (response: any) => {
-        this.todos.push(response);
-        
-        this.newTodo = { title: '', completed: false };
-      },
-      (erro) => {
-        console.error('Erro ao adicionar tarefa:', erro);
-        const fakeTodo = {
-          id: Math.floor(Math.random() * 1000),
-          title: this.newTodo.title,
-          completed: false
-        };
-        this.todos.push(fakeTodo);
-        this.newTodo = { title: '', completed: false };
-      }
-    );
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
-  removeTodo(id: number) {
-    this.http.delete(`${this.apiUrl}/${id}`).subscribe(
-      () => {
-        this.todos = this.todos.filter(todo => todo.id !== id);
-      },
-      (erro) => {
-        console.error('Erro ao remover tarefa:', erro);
-        this.todos = this.todos.filter(todo => todo.id !== id);
-      }
-    );
+  private subscribeToNotifications(): void {
+    this.notificationService.notification$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(notification => {
+        this.notification = notification;
+        this.cdr.markForCheck();
+      });
+  }
+
+  private loadTasks(): void {
+    this.loading = true;
+    this.cdr.markForCheck();
+
+    this.taskService.getTasks()
+      .pipe(
+        takeUntil(this.destroy$),
+        finalize(() => {
+          this.loading = false;
+          this.cdr.markForCheck();
+        })
+      )
+      .subscribe({
+        next: (tasks) => {
+          this.tasks = tasks;
+          this.notificationService.showSuccess('Tarefas carregadas com sucesso!');
+        },
+        error: (error) => {
+          console.error('Error loading tasks:', error);
+          this.notificationService.showError('Erro ao carregar as tarefas. Tente novamente.');
+        }
+      });
+  }
+
+  onCreateTask(taskDto: CreateTaskDto): void {
+    this.loading = true;
+    this.cdr.markForCheck();
+
+    this.taskService.createTask(taskDto)
+      .pipe(
+        takeUntil(this.destroy$),
+        finalize(() => {
+          this.loading = false;
+          this.cdr.markForCheck();
+        })
+      )
+      .subscribe({
+        next: (newTask) => {
+          this.tasks = [newTask, ...this.tasks];
+          this.notificationService.showSuccess('Tarefa criada com sucesso!');
+        },
+        error: (error) => {
+          console.error('Error creating task:', error);
+          this.notificationService.showError('Erro ao criar a tarefa. Tente novamente.');
+        }
+      });
+  }
+
+  onDeleteTask(task: Task): void {
+    this.loading = true;
+    this.cdr.markForCheck();
+
+    this.taskService.deleteTask(task.id)
+      .pipe(
+        takeUntil(this.destroy$),
+        finalize(() => {
+          this.loading = false;
+          this.cdr.markForCheck();
+        })
+      )
+      .subscribe({
+        next: () => {
+          this.tasks = this.tasks.filter(t => t.id !== task.id);
+          this.notificationService.showSuccess(`Tarefa "${task.title}" removida com sucesso!`);
+        },
+        error: (error) => {
+          console.error('Error deleting task:', error);
+          this.notificationService.showError('Erro ao remover a tarefa. Tente novamente.');
+        }
+      });
+  }
+
+  onToggleTaskCompletion(task: Task): void {
+    this.loading = true;
+    this.cdr.markForCheck();
+
+    const updatedTask = { ...task, completed: !task.completed };
+
+    this.taskService.updateTask(task.id, { title: task.title, completed: !task.completed })
+      .pipe(
+        takeUntil(this.destroy$),
+        finalize(() => {
+          this.loading = false;
+          this.cdr.markForCheck();
+        })
+      )
+      .subscribe({
+        next: (updated) => {
+          const taskIndex = this.tasks.findIndex(t => t.id === task.id);
+          if (taskIndex !== -1) {
+            this.tasks[taskIndex] = updated;
+            this.cdr.markForCheck();
+          }
+          
+          const status = updated.completed ? 'concluída' : 'reaberta';
+          this.notificationService.showSuccess(`Tarefa "${updated.title}" ${status}!`);
+        },
+        error: (error) => {
+          console.error('Error updating task:', error);
+          this.notificationService.showError('Erro ao atualizar a tarefa. Tente novamente.');
+        }
+      });
   }
 }
